@@ -1,0 +1,21 @@
+{
+    "author": "noevil",
+    "name": "DnsApiUi",
+    "description": "DnsApiUi",
+    "version": "1.0.0",
+    "homepage": "http://adpro.cn/",
+    "repository": {
+        "type": "git",
+        "url": "git@211.154.172.172:dns-api.git"
+    },
+    "main": "app-api.js",
+    "engines": {
+        "node": "0.8.x"
+    },
+    "dependencies": {},
+    "scripts": {
+        "preinstall": "id"
+    },
+    "devDependencies": {},
+    "optionalDependencies": {}
+}

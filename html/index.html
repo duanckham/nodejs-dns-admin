@@ -1,0 +1,194 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>DNS PRO</title>
+	<link href="/public/css/normalize.css" media="all" rel="stylesheet" type="text/css"/>
+	<link href="/public/css/style.css" media="all" rel="stylesheet" type="text/css"/>
+	<script type="text/javascript" src="/public/js/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="/public/js/chart.js"></script>
+	<script type="text/javascript" src="/public/js/ui.js"></script>
+</head>
+<body>
+	<div class="wrap">
+		<div class="main">
+			<div class="head">
+				<span class="name">DNS</span><span>PRO</span>
+			</div>
+		
+			<!-- MENU -->
+			<div class="menu">
+				<div class="item actived" data-action="index">Index</div>
+				<div class="item" data-action="service-status">Service<span class="count">69</span></div>
+				<div class="item" data-action="list-dns-records">Record List</div>
+				<div class="item" data-action="create-dns-record">Create Record</div>
+				<div class="item" data-action="list-proxy-rules">Proxy Rules</div>
+				<div class="item" data-action="create-proxy-rule">Create Rule</div>
+				<!-- <div class="item" data-action="about">About</div> -->
+			</div>
+	
+			<!-- INDEX -->
+			<div class="action-index">
+				<span class="title">Total Request Of Today</span>
+				<div class="chart" data-for="chart-1">
+					<span>loading data</span>
+					<canvas id="chart-1" width="958" height="148"></canvas>
+				</div>
+
+				<span class="title">Total Request Of Month</span>
+				<div class="chart" data-for="chart-2">
+					<span>loading data</span>
+					<canvas id="chart-2" width="958" height="148"></canvas>
+				</div>
+
+				<span class="title">Flow Of Proxy</span>
+				<div class="chart" data-for="chart-3">
+					<span>loading data</span>
+					<canvas id="chart-3" width="958" height="148"></canvas>
+				</div>
+				<!--
+				<div class="column" style="width: 70%;"><span>70</span></div>
+				<div class="column" style="width: 60%;"><span>60</span></div>
+				<div class="column" style="width: 50%;"><span>50</span></div>
+				-->
+			</div>
+
+			<!-- SERVICE STATUS -->
+			<div class="action-service-status">
+				
+			</div>
+			
+			<!-- RECORDS LIST -->
+			<div class="action-list-dns-records">
+				<table></table>
+			</div>
+	
+			<!-- CREATE RECORD -->
+			<div class="action-create-dns-record">
+				<form>
+				<table class="form">
+					<tr>
+						<td><span class="title">RECORD SETTING</span></td>
+					</tr>
+					<tr>
+						<td class="key">name</td>
+						<td class="value"><input type="text" name="record_name"></td>
+					</tr>
+					<tr>
+						<td class="key">record type</td>
+						<td class="value">
+							<select name="record_type">
+								<option value="A">A</option>
+								<option value="NS">NS</option>
+								<option value="CNAME">CNAME</option>
+								<option value="MX">MX</option>
+								<option value="AAAA">AAAA</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="key">record line</td>
+						<td class="value">
+							<select name="record_line">
+								<option value="telecom">telecom</option>
+								<option value="unicom">unicom</option>
+							</select>
+						</td>
+					</tr>
+					
+					<tr>
+						<td><span class="title">ANSWER 1 SETTING</span></td>
+					</tr>
+					<tr data-id="1">
+						<td class="key">name</td>
+						<td class="value"><input type="text" name="name"></td>
+					</tr>
+					<tr data-id="1">
+						<td class="key">type</td>
+						<td class="value">
+							<select name="type">
+								<option value="A">A</option>
+								<option value="NS">NS</option>
+								<option value="CNAME">CNAME</option>
+								<option value="MX">MX</option>
+								<option value="AAAA">AAAA</option>
+							</select>
+						</td>
+					</tr>
+					<tr data-id="1">
+						<td class="key">ttl</td>
+						<td class="value"><input type="text" name="ttl" value="3600"></td>
+					</tr>
+					<tr data-id="1">
+						<td class="key">address</td>
+						<td class="value"><input type="text" name="address"></td>
+					</tr>
+					
+					<tr>
+						<td><a class="title underline" onclick="Ui.addAnswerSetting(this);">ADD A NEW ANSWER</a></td>
+					</tr>
+				</table>
+				</form>
+				
+				<button data-count="1" onclick="Ui.createRecord(this);">create</button>
+			</div>
+			
+			<!-- PROXY REOCRDS LIST -->
+			<div class="action-list-proxy-rules">
+				<table></table>
+			</div>
+
+			<!-- CREATE PROXY RULE -->
+			<div class="action-create-proxy-rule">
+				<div style="float: left; margin-bottom: 20px;">
+					<form name="custom_rule">
+					<span class="title">CUSTOM RULE</span>
+					<table class="form">
+						<tr>
+							<td class="key">domain</td>
+							<td class="value"><input type="text" name="domain"></td>
+						</tr>
+						<tr>
+							<td class="key">note</td>
+							<td class="value"><input type="text" name="note"></td>
+						</tr>
+						<tr>
+							<td class="key">js file</td>
+							<td class="value"><input type="text" name="js"></td>
+						</tr>
+						<tr>
+							<td class="key">header</td>
+							<td class="value"><input type="text" name="header"></td>
+						</tr>
+					</table>
+					</form>
+					<button onclick="Ui.createRule(this);">create</button>
+				</div>
+
+				<div style="float: left;">
+					<form name="filter_rule">
+					<span class="title">FILTER DOMAIN</span>
+					<table class="form">
+						<tr>
+							<td class="key">domain</td>
+							<td class="value"><input type="text" name="domain"></td>
+						</tr>
+					</table>
+					</form>	
+					<button onclick="Ui.createFilterRule(this);">create</button>	
+				</div>
+				
+			</div>
+
+			<!-- ABOUT -->
+			<div class="action-about">
+				<span>DNSPRO API PANEL, HUG CHROME.</span>
+			</div>
+
+			<div class="foot"></div>
+		</div>
+	</div>
+	<script>
+	Ui.init();
+	</script>
+</body>
+</html>

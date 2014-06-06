@@ -1,0 +1,332 @@
+/*
+MAIN COLOR DEEP: #3d658c;
+*/
+
+
+body,
+html {
+	margin: 0;
+	border: 0;
+	-webkit-font-smoothing: antialiased;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+div {
+	display: block;
+}
+
+a,
+a:visited {
+	color: #3d658c;
+	font-weight: bold;
+	text-decoration: none;
+}
+a.underline {
+	text-decoration: underline;
+}
+
+span {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 13px;
+}
+
+input {
+	border: 1px solid #eee;
+	outline: none;
+	height: 28px;
+	line-height: 18px;
+	padding: 5px;
+	min-width: 300px;
+	margin: 5px 0;
+}
+
+select {
+	height: 30px;
+	background: #fff;
+	outline: none;
+	border: 1px solid #eee;
+	min-width: 300px;
+	margin: 5px 0;
+}
+
+textarea {
+	outline: none;
+	border: 0;
+	resize: none;
+	font: 12px Consolas, "Liberation Mono", Courier, monospace;
+}
+
+button {
+	float: left;
+	display: block;
+	border: 0;
+	height: 30px;
+	padding: 9px 20px;
+	background: #eee;
+	font-size: 13px;
+	color: #3d658c;
+	line-height: 10px;
+	cursor: pointer;
+}
+button:hover {
+	background: #3d658c;
+	color: #fff;
+}
+
+table {
+	font-size: 13px;
+	line-height: 40px;
+}
+
+.wrap {
+	text-align: center;
+}
+
+[class^="action-"] {
+	display: none;
+}
+
+.head {
+	text-align: left;
+	display: block;
+	width: 100%;
+	margin-top: 10px;
+	margin-bottom: 20px;
+}
+.head .name {
+	color: #3d658c;
+}
+.head span {
+	font-weight: bold;
+	font-size: 20px;
+	color: #ccc;
+}
+
+.foot {
+	float: left;
+	display: block;
+	width: 100%;
+	height: 30px;
+}
+
+.msg {
+	float: left;
+	display: block;
+	border: 0;
+	height: 30px;
+	padding: 9px 20px;
+	font-size: 13px;
+	color: #3d658c;
+	line-height: 10px;
+	cursor: pointer;
+}
+.msg.success {
+	color: #42602d;
+}
+.msg.info {
+	color: #268785;
+}
+.msg.error {
+	color: #e83015;
+}
+
+.chart {
+	border: 1px solid #eee;
+	width: 958px;
+	height: 148px;
+	margin-bottom: 20px;
+}
+.chart span {
+	color: #aaa;
+	position: absolute;
+	line-height: 20px;
+	margin-left: 10px;
+}
+
+.main {
+	margin: 0 auto;
+	width: 960px;
+}
+
+.menu {
+	height: 32px;
+	margin-bottom: 20px;
+	color: #3d658c;
+	font-weight: bold;
+}
+.menu .item {
+	float: left;
+	height: 30px;
+	width: 160px;
+	border-bottom: 2px solid #eee;
+	line-height: 30px;
+	font-size: 13px;
+	cursor: pointer;
+}
+.menu .item.actived {
+	border-bottom: 2px solid #3d658c;
+}
+.menu .item .count {
+	background: #3d658c;
+	margin: 0 10px;
+	border-radius: 2px;
+	color: #fff;
+	padding: 0 5px;
+}
+
+.form {
+	border-collapse: inherit;
+	margin-bottom: 20px;
+}
+.form tr td {
+	display: block;
+	height: 40px;
+	float: left;
+}
+.form tr:hover {
+	background: #fff !important;
+	border-left: 1px solid #fff !important;
+}
+.form .key {
+	width: 160px;
+}
+.form .value {
+	width: 500px;
+}
+
+a.title,
+span.title {
+	text-align: left;
+	display: block;
+	line-height: 30px;
+	font-weight: bold;
+	color: #3d658c;
+	font-size: 13px;
+}
+
+a.title {
+	cursor: pointer;
+}
+a.title:hover {
+	color: #666;
+}
+
+.column {
+	display: block;
+	height: 40px;
+	background: #eee;
+	margin-bottom: 5px;
+	padding-left: 5px;
+	font-size: 13px;
+	line-height: 40px;
+	float: left;
+	color: #3d658c;
+	text-align: left;
+}
+.column:hover {
+	background: #ddd;
+}
+
+.action-index,
+.action-about {
+	width: 100%;
+	float: left;
+	text-align: left;
+	font-size: 13px;
+}
+.action-create-record {
+	width: 100%;
+}
+.action-list-dns-records tr,
+.action-list-proxy-rules tr {
+	display: block;
+	/*height: 40px;*/
+	border-left: 2px solid #fff;
+	line-height: 32px;
+	cursor: pointer;
+	float: left;
+}
+.action-list-dns-records tr:hover,
+.action-list-proxy-rules tr:hover {
+	border-left: 2px solid #3d658c;
+	background: #eee;
+}
+.action-list-dns-records .actived,
+.action-list-proxy-rules .actived {
+	border-left: 1px solid #000 !important;
+	background: #eee;
+}
+.action-list-dns-records td,
+.action-list-proxy-rules td {
+	padding-left: 5px;
+}
+
+.action-list-proxy-rules .expend,
+.action-list-proxy-rules .expend:hover,
+.action-list-dns-records .expend,
+.action-list-dns-records .expend:hover {
+	display: block;
+	border-left: 1px solid #000 !important;
+	height: auto;
+	background: #fff;
+}
+.action-list-proxy-rules .expend td,
+.action-list-dns-records .expend td {
+	margin: 0 !important;
+	/*padding: 0 !important;*/
+	float: left;
+	display: block;
+}
+.action-list-proxy-rules .expend button,
+.action-list-dns-records .expend button {
+	margin: 10px 5px 10px 5px;
+}
+.action-list-dns-records .form {
+	float: left;
+	width: 470px;
+	margin: 0;
+	padding: 0;
+}
+.action-list-dns-records .form .value {
+	width: 300px;
+}
+
+.action-service-status .notice {
+	float: left;
+	background: #eee;
+	margin-bottom: 10px;
+}
+
+.action-service-status .notice .l {
+	float: left;
+	width: 160px;
+	background: #ddd;
+}
+.action-service-status .notice .l span.date {
+	line-height: 30px;
+	font-size: 13px;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.action-service-status .notice .r {
+	float: left;
+	width: 800px;
+	background: #ccc;
+	text-align: left;
+}
+.action-service-status .notice .r span {
+	line-height: 30px;
+	font-size: 13px;
+	cursor: pointer;
+	font-weight: bold;
+}
+.action-service-status .notice .r span.success {
+	color: #42602d;
+}
+.action-service-status .notice .r span.info {
+	color: #3d658c;
+}
+.action-service-status .notice .r span.error {
+	color: #e83015;
+}

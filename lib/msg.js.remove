@@ -1,0 +1,532 @@
+var http = require('http');
+var config = require('../config');
+var DB = require('./db');
+
+var ApiMsg = function() {
+	this.init();
+	return this;
+};
+
+ApiMsg.prototype.init = function() {
+	this.db_records = new DB('RECORDS');
+	this.db_expires = new DB('EXPIRES');
+	this.db_index = new DB('INDEX');
+	this.db_proxy = new DB('PROXY');
+	this.db_statistics = new DB('STATISTICS');
+};
+
+ApiMsg.prototype.type_map = {
+	'A': 1,
+	'NS': 2,
+	'CNAME': 5,
+	'MX': 15,
+	'AAAA': 28
+};
+
+ApiMsg.prototype.date = function(range) {
+	var date = new Date(),
+		_y = date.getFullYear() + '',
+		_m = date.getMonth() + 1 + '',
+		_d = date.getDate() + '',
+		_h = date.getHours() + '';
+
+	//
+	_m = _m[1] ? _m : '0' + _m;
+	_d = _d[1] ? _d : '0' + _d;
+	_h = _h[1] ? _h : '0' + _h;
+
+	var results = {
+		year: _y,
+		month: _y + _m,
+		day: _y + _m + _d,
+		hour: _y + _m + _d + _h
+	};
+
+	return results[range];
+};
+
+ApiMsg.prototype.send = function(path, body, res) {
+	try {
+		this.action(path, body.length === 0 ? null : JSON.parse(body), function(error, result) {
+			if (error) {
+				res.statusCode = 400;
+				return res.end(JSON.stringify(error, null, 2) + '\n');
+			}
+			res.end(JSON.stringify(result, null, 2) + '\n');
+		});
+	} catch (error) {
+		console.log(error, body);
+		res.statusCode = 400;
+		return res.end('error: ' + error.message + '\n');
+	}
+
+	res.writeHead(200, {
+		'Content-Type': 'text/plain'
+	});
+};
+
+ApiMsg.prototype.action = function(act, data, callback) {
+	var self = this;
+	var actions = {};
+
+	// console.log('act', act);
+	// console.log('data', data);
+
+	// API FUNCTION MAP
+
+	/*
+	API => ACTION
+	self['action' + act.replace('/', '').replace('.', '')](this, data, callback);
+	*/
+
+	actions['/Test'] = self.actionTest;
+	actions['/Dns.Record.Create'] = self.actionDnsRecordCreate;
+	actions['/Dns.Record.List'] = self.actionDnsRecordList;
+	actions['/Dns.Record.Modify'] = self.actionDnsRecordModify;
+	actions['/Dns.Record.Remove'] = self.actionDnsRecordRemove;
+	actions['/Dns.Record.Info'] = self.actionDnsRecordInfo;
+	actions['/Proxy.Rule.Info'] = self.actionProxyRuleInfo;
+	actions['/Proxy.Rule.List'] = self.actionProxyRuleList;
+	actions['/Proxy.Rule.Create'] = self.actionProxyRuleCreate;
+	actions['/Proxy.Rule.Remove'] = self.actionProxyRuleRemove;
+	actions['/Statistics.Dns.Reqs.Month'] = self.actionStatisticsDnsReqs('month');
+	actions['/Statistics.Dns.Reqs.Day'] = self.actionStatisticsDnsReqs('day');
+	actions['/Statistics.Dns.Reqs.Hour'] = self.actionStatisticsDnsReqs('hour');
+	actions['/Statistics.Proxy.Flow.Month'] = self.actionStatisticsProxyFlow('month');
+	actions['/Statistics.Proxy.Flow.Day'] = self.actionStatisticsProxyFlow('day');
+	actions['/Statistics.Proxy.Flow.Hour'] = self.actionStatisticsProxyFlow('hour');
+
+	if (!actions[act]) callback({
+		status: 0,
+		message: 'API_CAN_NOT_USE'
+	});
+
+	// actions[act].bind(this);
+	actions[act](this, data, function(error, result) {
+		callback(error, result);
+	});
+};
+
+ApiMsg.prototype.actionTest = function(self, data, callback) {
+	callback(null, {
+		status: 1,
+		msg: 'Test success.'
+	});
+};
+
+/*
+{
+	name: 'v2ex.com',
+	record_type: 'A',
+	record_line: 'unicom, telecom'
+	ttl: 300,
+	address: '1.1.1.1'
+}
+*/
+ApiMsg.prototype.actionDnsRecordCreate = function(self, data, callback) {
+	data.record_type = self.type_map[data.record_type];
+
+	var _key = data.record_name + ':' + data.record_type + ':setting:isp';
+	var answers = [];
+
+	self.db_records.get(_key, function(key, value, error) {
+		if (!error) {
+			// IF EXIST
+			if (value && value != 'undefined') {
+				value = JSON.parse(value);
+			} else {
+				value = {};
+			}
+
+			// ANSWERS
+			for (var i in data.answers) {
+				var _record = {
+					name: data.answers[i].name,
+					type: self.type_map[data.answers[i].type],
+					ttl: data.answers[i].ttl,
+					address: data.answers[i].address,
+					data: data.answers[i].address, // FOR NS/CNAME/PTR RECORD
+					class: 1
+				};
+
+				// FOR MX RECORD
+				if (_record.type === 15) {
+					if (data.answers[i].address.indexOf(':') < 0) {
+						_record.exchange = _record.address;
+						_record.priority = 5;
+					} else {
+						_record.exchange = _record.address.split(':')[0];
+						_record.priority = _record.address.split(':')[1];
+					}
+				}
+
+				answers.push(_record);
+			}
+
+			// CREATE OBJ
+			value[data.record_line] = {
+				answer: answers,
+				authority: [{
+					name: data.record_name,
+					type: 2,
+					ttl: 3600,
+					class: 1,
+					data: config.NS_SERVERS[0]
+				}, {
+					name: data.record_name,
+					type: 2,
+					ttl: 3600,
+					class: 1,
+					data: config.NS_SERVERS[1]
+				}],
+				additional: [{
+					name: config.NS_SERVERS[0],
+					type: 1,
+					ttl: 9950,
+					class: 1,
+					address: config.NS_SERVERS_IP[0]
+				}, {
+					name: config.NS_SERVERS[1],
+					type: 1,
+					ttl: 9950,
+					class: 1,
+					address: config.NS_SERVERS_IP[1]
+				}]
+			};
+
+			// UPDATE
+			self.db_records.put(_key, JSON.stringify(value));
+			// INSERT INDEX
+			self.db_index.put(config.RECORDS_DB + ':ns:' + _key, _key);
+
+			return error ? callback({
+				message: 'ERROR'
+			}) : callback(null, {
+				status: 1
+			});
+		} else {
+			return callback({
+				message: 'ERROR'
+			});
+		}
+	});
+};
+
+ApiMsg.prototype.actionDnsRecordList = function(self, data, callback) {
+	var _results = [];
+
+	self.db_index.find({
+		prefix: config.RECORDS_DB + ':ns:',
+		limit: 200
+	}, function(key, value, error) {
+		if (!key) {
+			return callback(null, {
+				status: 1,
+				records: _results
+			});
+		}
+
+		_results.push(value);
+	});
+};
+
+// LOOK LIKE RECORD.CREATE, =_=
+// ApiMsg.prototype.actionDnsRecordModify = function(self, data, callback) {
+// 	data.record_type = self.type_map[data.record_type];
+
+// 	var _key = data.name + ':' + data.record_type + ':setting:isp';
+
+// 	self.db_records.get(_key, function(key, value, error) {
+// 		if (!error && value && value != 'undefined') {
+// 			value = JSON.parse(value);
+
+// 			if (!value[data.record_line]) {
+// 				return callback({
+// 					message: 'RECORD_NOT_EXIST'
+// 				});
+// 			}
+
+// 			// CREATE OBJ
+// 			value[data.record_line] = {
+// 				answer: [{
+// 					name: data.name,
+// 					type: data.record_type,
+// 					class: 1,
+// 					ttl: data.ttl,
+// 					address: data.address
+// 				}],
+// 				authority: [{
+// 					name: data.name,
+// 					type: 2,
+// 					ttl: 3600,
+// 					class: 1,
+// 					data: config.NS_SERVERS[0]
+// 				}, {
+// 					name: data.name,
+// 					type: 2,
+// 					ttl: 3600,
+// 					class: 1,
+// 					data: config.NS_SERVERS[1]
+// 				}],
+// 				additional: [{
+// 					name: config.NS_SERVERS[0],
+// 					type: 1,
+// 					ttl: 9950,
+// 					class: 1,
+// 					address: config.NS_SERVERS_IP[0]
+// 				}, {
+// 					name: config.NS_SERVERS[1],
+// 					type: 1,
+// 					ttl: 9950,
+// 					class: 1,
+// 					address: config.NS_SERVERS_IP[1]
+// 				}]
+// 			};
+
+// 			// UPDATE
+// 			self.db_records.put(_key, JSON.stringify(value));
+// 			return callback(null, {
+// 				status: 1
+// 			});
+// 		}
+// 	});
+// };
+
+/*
+{
+	name:
+	record_type:
+}
+*/
+ApiMsg.prototype.actionDnsRecordRemove = function(self, data, callback) {
+	data.record_type = self.type_map[data.record_type];
+	var _key = data.name + ':' + data.record_type + ':setting:isp';
+	// DELETE RECORD
+	self.db_records.delete(_key);
+	// DELETE INDEX
+	self.db_index.delete(config.RECORDS_DB + ':ns:' + _key);
+
+	// NO ERROR CATCH
+	return callback(null, {
+		status: 1
+	});
+};
+
+/*
+{
+	name:
+	record_type:
+}
+*/
+ApiMsg.prototype.actionDnsRecordInfo = function(self, data, callback) {
+	data.record_type = self.type_map[data.record_type];
+	var _key = data.name + ':' + data.record_type + ':setting:isp';
+
+	self.db_records.get(_key, function(key, value, error) {
+		if (!error && value && value != 'undefined') {
+			return callback(null, {
+				status: 1,
+				record: JSON.parse(value)
+			});
+		} else {
+			return callback({
+				message: 'ERROR'
+			});
+		}
+	});
+};
+
+/*
+	domain:
+*/
+ApiMsg.prototype.actionProxyRuleInfo = function(self, data, callback) {
+	self.db_proxy.get(data.domain, function(key, value, error) {
+		if (!error && value) {
+			return callback(null, {
+				status: 1,
+				rule: JSON.parse(value)
+			});
+		}
+		return callback({
+			message: 'CAN_NOT_FIND_RECORD_OR_HAVE ERROR'
+		});
+	});
+};
+
+ApiMsg.prototype.actionProxyRuleList = function(self, data, callback) {
+	var results = [];
+
+	// THERE HAVE LIMIT, JUST WRITE UI, DON'T THINK IT.
+	self.db_proxy.find({}, function(key, value, error) {
+		if (!error && key && value) {
+			return results.push(key);
+		}
+
+		if (!error && !key) {
+			return callback(null, {
+				status: 1,
+				rules: results
+			});
+		}
+
+		return callback({
+			message: 'CAN_NOT_FIND_RECORD_OR_HAVE ERROR'
+		});
+	});
+};
+
+/*
+{
+	domain:
+}
+*/
+ApiMsg.prototype.actionProxyRuleCreate = function(self, data, callback) {
+	// CREATE OR MODIFY
+	self.db_proxy.put(data.domain, JSON.stringify(data));
+
+	return callback(null, {
+		status: 1
+	});
+};
+
+/*
+{
+	domain:
+}
+*/
+ApiMsg.prototype.actionProxyRuleRemove = function(self, data, callback) {
+	// DELETE RECORD
+	self.db_proxy.delete(data.domain);
+
+	return callback(null, {
+		status: 1
+	});
+};
+
+ApiMsg.prototype.actionStatisticsDnsReqs = function(range) {
+	var self = this,
+		_ranges,
+		_search,
+		_results = {},
+		_counter = 0;
+
+	return function(self, data, callback) {
+		switch (range) {
+			case 'month':
+				_ranges = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+				_search = self.date('year');
+				break;
+			case 'day':
+				_ranges = [
+					'01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
+					'11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+					'21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31'
+				];
+				_search = self.date('month');
+				break;
+			case 'hour':
+				_ranges = [
+					'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12',
+					'13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'
+				];
+				_search = self.date('day');
+				break;
+		}
+
+		_counter = _ranges.length;
+
+		for (var i in _ranges) {
+			self.db_statistics.get('total:' + _search + _ranges[i], function(key, value, error) {
+				if (!error && key && value) {
+					_results[key.replace('total:', '')] = value;
+				}
+				_counter--;
+
+				if (_counter === 0) _callback();
+			});
+		}
+
+		var _callback = function() {
+			var _return = {
+				x: [],
+				y: []
+			};
+
+			for (var i in _ranges) {
+				_return.x.push(_ranges[i]);
+				_return.y.push(parseInt(_results[_search + _ranges[i]] || 0));
+			}
+
+			callback(null, {
+				status: 1,
+				x: _return.x,
+				y: _return.y
+			});
+		};
+	};
+};
+
+ApiMsg.prototype.actionStatisticsProxyFlow = function(range) {
+	var self = this,
+		_ranges,
+		_search,
+		_results = {},
+		_counter = 0;
+
+	return function(self, data, callback) {
+		switch (range) {
+			case 'month':
+				_ranges = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+				_search = self.date('year');
+				break;
+			case 'day':
+				_ranges = [
+					'01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
+					'11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+					'21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31'
+				];
+				_search = self.date('month');
+				break;
+			case 'hour':
+				_ranges = [
+					'01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12',
+					'13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'
+				];
+				_search = self.date('day');
+				break;
+		}
+
+		_counter = _ranges.length;
+
+		for (var i in _ranges) {
+			self.db_statistics.get('total:proxy:flow:' + _search + _ranges[i], function(key, value, error) {
+				if (!error && key && value) {
+					_results[key.replace('total:proxy:flow:', '')] = value;
+				}
+				_counter--;
+
+				if (_counter === 0) _callback();
+			});
+		}
+
+		var _callback = function() {
+			var _return = {
+				x: [],
+				y: []
+			};
+
+			for (var i in _ranges) {
+				_return.x.push(_ranges[i]);
+				_return.y.push(parseInt(_results[_search + _ranges[i]] || 0) / 1024); // KB
+			}
+
+			callback(null, {
+				status: 1,
+				x: _return.x,
+				y: _return.y
+			});
+		};
+	};
+};
+
+module.exports = ApiMsg;
