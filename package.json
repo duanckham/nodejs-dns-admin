@@ -1,21 +1,31 @@
 {
-    "author": "noevil",
-    "name": "DnsApiUi",
-    "description": "DnsApiUi",
-    "version": "1.0.0",
-    "homepage": "http://adpro.cn/",
-    "repository": {
-        "type": "git",
-        "url": "git@211.154.172.172:dns-api.git"
-    },
-    "main": "app-api.js",
-    "engines": {
-        "node": "0.8.x"
-    },
-    "dependencies": {},
-    "scripts": {
-        "preinstall": "id"
-    },
-    "devDependencies": {},
-    "optionalDependencies": {}
+  "author": "noevil",
+  "name": "dns-admin",
+  "description": "DnsApiUi",
+  "version": "0.0.2",
+  "homepage": "http://adpro.cn/",
+  "repository": {
+    "type": "git",
+    "url": "git@211.154.172.172:dns-api.git"
+  },
+  "main": "app-api.js",
+  "engines": {
+    "node": "0.8.x"
+  },
+  "dependencies": {
+    "express": "*",
+    "body-parser": "*",
+    "mongodb": "*"
+  },
+  "scripts": {
+    "preinstall": "id"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "keywords": [
+    "nodejs",
+    "dns",
+    "admin"
+  ],
+  "license": "BSD"
 }
