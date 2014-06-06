@@ -30,15 +30,22 @@
 
 			// ACTIONS
 			switch (action_name) {
+				case 'service-status':
+					renderServiceStatus(el);
+					break;
+
 				case 'list-dns-records':
 					renderDnsRecordsList(el);
 					break;
+
 				case 'create-dns-record':
 					renderCreateRecord(el);
 					break;
+
 				case 'list-proxy-rules':
 					renderProxyRulesList(el);
 					break;
+
 				case 'create-proxy-rule':
 					renderCreateProxyRule(el);
 					break;
@@ -100,21 +107,29 @@
 		});
 	};
 
-	var renderServiceStatus = function() {
+	var renderServiceStatus = function(el) {
 
-		// $.post
+		$.post('/api/Service.Notice.List', function(r) {
+			var html = [];
 
-		// var html = [];
+			r.data.forEach(function(item) {
+				var s = '';
 
-		// <div class="notice">
-		// 	<div class="l">
-		// 		<span class="date">2014/05/05</span>
-		// 	</div>
-		// 	<div class="r">
-		// 		<span class="info">Numeric literals can contain extra formatting to make them easier to read.</span>
-		// 		<textarea readonly="true" cols="100">aaa</textarea>
-		// 	</div>
-		// </div>
+				s += '<div class="notice">';
+				s += '	<div class="l">';
+				s += '	<span class="date">' + item.date + '</span>';
+				s += '	</div>';
+				s += '	<div class="r">';
+				s += '		<span class="info">' + item.content + '</span>';
+				s += '		<textarea readonly="true" cols="100"></textarea>';
+				s += '	</div>';
+				s += '</div>';
+
+				html.push(s);
+			});
+
+			el.html(html.join(''));
+		});
 	};
 
 	var renderDnsRecordsList = function(el) {
@@ -126,23 +141,22 @@
 			el.find('table').html('');
 
 			var html = [];
-			for (var i = 0; i < r.data.length; i++) {
+			
+			r.data.forEach(function(item) {
 				var s = '';
 
-				// console.log(r.data[i]);
-
-				s += '<tr data-record="' + r.data[i].record_id + '">';
-				s += '<td style="width:320px;" onclick="Ui.getRecordDetail(this);">' + r.data[i].record_name + '</td>';
-				s += '<td style="width:520px;" onclick="Ui.getRecordDetail(this);">' + type_map[r.data[i].record_type] + '</td>';
+				s += '<tr data-record="' + item.record_id + '">';
+				s += '<td style="width:320px;" onclick="Ui.getRecordDetail(this);">' + item.record_name + '</td>';
+				s += '<td style="width:520px;" onclick="Ui.getRecordDetail(this);">' + type_map[item.record_type] + '</td>';
 				s += '<td style="width:120px; text-align: right;">';
 				s += '<a href="javascript:void(0);" onclick="Ui.editRecordDetail(this);">Edit</a>';
 				s += '<span> / </span>'
-				s += '<a href="javascript:void(0);" onclick="Ui.removeRecord(\'' + r.data[i]._id + '\');">Remove</a>';
+				s += '<a href="javascript:void(0);" onclick="Ui.removeRecord(\'' + item._id + '\');">Remove</a>';
 				s += '</td>';
 				s += '</tr>';
 
-				html.push(s);
-			}
+				html.push(s);			
+			});
 
 			el.find('table').append(html.join(''));
 		}, 'json');
