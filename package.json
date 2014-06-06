@@ -1,31 +1,29 @@
 {
-  "author": "noevil",
-  "name": "dns-admin",
-  "description": "DnsApiUi",
-  "version": "0.0.2",
-  "homepage": "http://adpro.cn/",
-  "repository": {
-    "type": "git",
-    "url": "git@211.154.172.172:dns-api.git"
-  },
-  "main": "app-api.js",
-  "engines": {
-    "node": "0.8.x"
-  },
+  "name": "dns-api",
+  "version": "0.0.1",
+  "description": "nodejs, dns, admin",
+  "main": "app.js",
   "dependencies": {
-    "express": "*",
-    "body-parser": "*",
-    "mongodb": "*"
-  },
-  "scripts": {
-    "preinstall": "id"
+    "body-parser": "~1.2.2",
+    "express": "~4.3.1",
+    "mongodb": "~1.4.5"
   },
   "devDependencies": {},
-  "optionalDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/noevil/nodejs-dns-admin.git"
+  },
   "keywords": [
     "nodejs",
     "dns",
     "admin"
   ],
-  "license": "BSD"
+  "author": "Noevil",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/noevil/nodejs-dns-admin/issues"
+  }
 }
