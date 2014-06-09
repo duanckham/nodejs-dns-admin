@@ -112,7 +112,7 @@
 
 	var renderServiceNoticeCount = function() {
 		var heartbeat = setInterval(function() {
-			$('/api/Service.Notice.Status', function(r) { 
+			$.post('/api/Service.Notice.Status', function(r) { 
 				$('[data-action=service-status]').find('span').html(r.data.notice);
 			})	
 		}, 3000);
