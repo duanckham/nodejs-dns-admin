@@ -107,28 +107,62 @@
 		});
 	};
 
-	var renderServiceStatus = function(el) {
+	var renderServiceStatus = function(el, page) {
+		var render = function(r) {
+			if (r.data.length === 0)
+				return;
 
-		$.post('/api/Service.Notice.List', function(r) {
 			var html = [];
 
 			r.data.forEach(function(item) {
 				var s = '';
+				var spot = JSON.stringify(item.spot, null, 2); 
 
 				s += '<div class="notice">';
 				s += '	<div class="l">';
-				s += '	<span class="date">' + item.date + '</span>';
+				s += '	<span class="date">' + moment(item.date).format('YYYY-MM-DD HH:mm:ss') + '</span>';
 				s += '	</div>';
 				s += '	<div class="r">';
-				s += '		<span class="info">' + item.content + '</span>';
-				s += '		<textarea readonly="true" cols="100"></textarea>';
+				s += '		<span class="info ' + item.type + '" onclick="Ui.getNoticeDetail(this);">' + item.content + '</span>';
+				s += '		<textarea readonly="true" cols="100" rows="' + spot.split('\n').length + '">' + spot + '</textarea>';
 				s += '	</div>';
 				s += '</div>';
 
 				html.push(s);
 			});
 
+			var l_date = r.data.length ? r.data[r.data.length - 1].date : false;
+			var r_date = r.data.length ? r.data[0].date : false;
+
+			// PAGE
+			html.push('<div class="page">');
+			html.push('<a class="r" onclick="Ui.nextNoticePage(this, ' + r_date + ');">Next »</a>');
+			html.push('<a class="l" onclick="Ui.prevNoticePage(this, ' + l_date + ');">« Previous</a>');
+			html.push('</div>');
+
 			el.html(html.join(''));
+		};
+
+		page
+			? $.post('/api/Service.Notice.List', page, render)
+			: $.post('/api/Service.Notice.List', render);
+	};
+
+	var prevNoticePage = function(el, date) {
+		if (!date) return;
+
+		renderServiceStatus($('.action-service-status'), {
+			page: 'prev',
+			date: date
+		});
+	};
+
+	var nextNoticePage = function(el, date) {
+		if (!date) return;
+
+		renderServiceStatus($('.action-service-status'), {
+			page: 'next',
+			date: date
 		});
 	};
 
@@ -208,6 +242,10 @@
 		}, 'json');
 	};
 
+	var getNoticeDetail = function(el) {
+		$(el).next().toggle();
+	};
+
 	var getRecordDetail = function(el, hold) {
 		var el = $(el).closest('tr');
 		var record_id = el.attr('data-record');
@@ -218,9 +256,6 @@
 		};
 
 		$.post('api/Dns.Record.Info', data, function(r) {
-			
-			console.log(r);
-
 			$('[data-expend="' + record_id + '"]').remove();
 
 			if ($(el).hasClass('actived') && !hold)
@@ -517,6 +552,9 @@
 	exports.modifyRecord = modifyRecord;
 	exports.removeRecord = removeRecord;
 	exports.createRecord = createRecord;
+	exports.prevNoticePage = prevNoticePage;
+	exports.nextNoticePage = nextNoticePage;
+	exports.getNoticeDetail = getNoticeDetail;
 	exports.getRecordDetail = getRecordDetail;
 	exports.editRecordDetail = editRecordDetail;
 	exports.createRule = createRule;

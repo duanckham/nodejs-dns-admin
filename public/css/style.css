@@ -293,26 +293,27 @@ a.title:hover {
 
 .action-service-status .notice {
 	float: left;
-	background: #eee;
+	/*background: #eee;*/
 	margin-bottom: 10px;
 }
 
 .action-service-status .notice .l {
 	float: left;
 	width: 160px;
-	background: #ddd;
+	/*background: #ddd;*/
 }
 .action-service-status .notice .l span.date {
 	line-height: 30px;
 	font-size: 13px;
 	cursor: pointer;
 	font-weight: bold;
+	color: #333;
 }
 
 .action-service-status .notice .r {
 	float: left;
 	width: 800px;
-	background: #ccc;
+	/*background: #ccc;*/
 	text-align: left;
 }
 .action-service-status .notice .r span {
@@ -328,5 +329,29 @@ a.title:hover {
 	color: #3d658c;
 }
 .action-service-status .notice .r span.error {
-	color: #e83015;
+	/*color: #e83015;*/
+	color: #f29d50;
+}
+.action-service-status .notice .r textarea {
+	display: none;
+}
+.action-service-status .page {
+	float: left;
+	width: 960px;
+	height: 40px;
+	margin-top: 10px;
+	border-radius: 3px;
+	border: 1px #ddd solid;
+}
+.action-service-status .page a {
+	line-height: 40px;
+	font-size: 12px;
+	margin: 0 20px;
+	cursor: pointer;
+}
+.action-service-status .page a.l {
+	float: left;
+}
+.action-service-status .page a.r {
+	float: right;
 }
