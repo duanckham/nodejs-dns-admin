@@ -342,6 +342,10 @@ a.title:hover {
 	margin-top: 10px;
 	border-radius: 3px;
 	border: 1px #ddd solid;
+
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
 }
 .action-service-status .page a {
 	line-height: 40px;

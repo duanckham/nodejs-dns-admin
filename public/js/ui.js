@@ -10,6 +10,7 @@
 	};
 
 	var init = function() {
+		// HANDEL MENU
 		$('[data-action]').on('click', function(e) {
 			var action_name = $(this).attr('data-action'),
 				el = $('.action-' + action_name);
@@ -53,7 +54,9 @@
 		});
 
 		$('.action-index').css('display', 'block');
+		
 		renderIndex();
+		renderServiceNoticeCount();
 	};
 
 	var renderIndex = function() {
@@ -105,6 +108,14 @@
 			$('[data-for="chart-3"]').find('span').hide(300);
 			new Chart($('#chart-3').get(0).getContext('2d')).Line(_createData(r.data));
 		});
+	};
+
+	var renderServiceNoticeCount = function() {
+		var heartbeat = setInterval(function() {
+			$('/api/Service.Notice.Status', function(r) { 
+				$('[data-action=service-status]').find('span').html(r.data.notice);
+			})	
+		}, 3000);
 	};
 
 	var renderServiceStatus = function(el, page) {
