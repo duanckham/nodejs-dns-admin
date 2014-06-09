@@ -241,14 +241,14 @@ a.title:hover {
 .action-list-proxy-rules tr {
 	display: block;
 	/*height: 40px;*/
-	border-left: 2px solid #fff;
+	border-left: 1px solid #fff;
 	line-height: 32px;
 	cursor: pointer;
 	float: left;
 }
 .action-list-dns-records tr:hover,
 .action-list-proxy-rules tr:hover {
-	border-left: 2px solid #3d658c;
+	border-left: 1px solid #3d658c;
 	background: #eee;
 }
 .action-list-dns-records .actived,
