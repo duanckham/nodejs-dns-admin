@@ -295,6 +295,7 @@ a.title:hover {
 	float: left;
 	/*background: #eee;*/
 	margin-bottom: 10px;
+	position: relative;
 }
 
 .action-service-status .notice .l {
@@ -309,7 +310,6 @@ a.title:hover {
 	font-weight: bold;
 	color: #333;
 }
-
 .action-service-status .notice .r {
 	float: left;
 	width: 800px;
@@ -335,6 +335,27 @@ a.title:hover {
 .action-service-status .notice .r textarea {
 	display: none;
 }
+.action-service-status .notice .s {
+	position: absolute;
+	border-radius: 3px;
+	height: 6px;
+	width: 6px;
+	top: 12px;
+	left: 6px;
+}
+.action-service-status .notice .s.success {
+	display: block;
+	background: #42602d;
+}
+.action-service-status .notice .s.info {
+	display: block;
+	background: #3d658c;
+}
+.action-service-status .notice .s.error {
+	display: block;
+	background: #f29d50;
+}
+
 .action-service-status .page {
 	float: left;
 	width: 960px;

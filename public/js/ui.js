@@ -84,7 +84,7 @@
 
 		// DNS REQS OF TODAY
 		$.post('api/Statistics.Dns.Reqs.Hour', function(r) {
-			if (r.success !== 1) 
+			if (!r.success) 
 				return;
 
 			$('[data-for="chart-1"]').find('span').hide(300);
@@ -93,7 +93,7 @@
 
 		// DNS REQS OF THIS MONTH
 		$.post('api/Statistics.Dns.Reqs.Day', function(r) {
-			if (r.success !== 1) 
+			if (!r.success) 
 				return;
 
 			$('[data-for="chart-2"]').find('span').hide(300);
@@ -102,7 +102,7 @@
 
 		// FLOW OF THIS MONTH
 		$.post('api/Statistics.Proxy.Flow.Day', function(r) {
-			if (r.success !== 1) 
+			if (!r.success) 
 				return;
 
 			$('[data-for="chart-3"]').find('span').hide(300);
@@ -129,12 +129,13 @@
 				var s = '';
 				var spot = JSON.stringify(item.spot, null, 2); 
 
-				s += '<div class="notice">';
+				s += '<div class="notice" data-read="' + item.read + '">';
+				s += '	<div class="s ' + (!item.read && item.type) + '"></div>';
 				s += '	<div class="l">';
 				s += '	<span class="date">' + moment(item.date).format('YYYY-MM-DD HH:mm:ss') + '</span>';
 				s += '	</div>';
 				s += '	<div class="r">';
-				s += '		<span class="info ' + item.type + '" onclick="Ui.getNoticeDetail(this);">' + item.content + '</span>';
+				s += '		<span class="info ' + item.type + '" onclick="Ui.getNoticeDetail(this, \'' + item._id + '\');">' + item.content + '</span>';
 				s += '		<textarea readonly="true" cols="100" rows="' + spot.split('\n').length + '">' + spot + '</textarea>';
 				s += '	</div>';
 				s += '</div>';
@@ -159,6 +160,19 @@
 			: $.post('/api/Service.Notice.List', render);
 	};
 
+	var getNoticeDetail = function(el, id) {
+		if ($(el).parents('.notice').attr('data-read') == 0) {
+			$.post('/api/Service.Notice.Read', {id: id}, function(r) {
+				if (r.success) {
+					$(el).parents('.notice').find('.s').attr('class', 's');
+					$(el).closest('.s').attr('class', 's');
+				}
+			});
+		}
+
+		$(el).next().toggle();
+	};
+
 	var prevNoticePage = function(el, date) {
 		if (!date) return;
 
@@ -179,7 +193,7 @@
 
 	var renderDnsRecordsList = function(el) {
 		$.post('api/Dns.Record.List', function(r) {
-			if (r.success == 0) 
+			if (!r.success) 
 				return;
 
 			// CLEAN TABLE
@@ -189,8 +203,6 @@
 			
 			r.data.forEach(function(item) {
 				var s = '';
-
-				console.log(item);
 
 				s += '<tr data-record="' + item.record_id + '">';
 				s += '<td style="width:320px;" onclick="Ui.getRecordDetail(this);">' + item.record_name + '</td>';
@@ -248,15 +260,11 @@
 			if (el.find('span.msg').length > 0)
 				el.find('span.msg').remove();
 
-			r.success === 1
+			r.success
 				? $(btn).after('<span class="msg success">success<span>')
 				: $(btn).after('<span class="msg error">error:' + r.message + '<span>');
 
 		}, 'json');
-	};
-
-	var getNoticeDetail = function(el) {
-		$(el).next().toggle();
 	};
 
 	var getRecordDetail = function(el, hold) {
@@ -422,7 +430,7 @@
 		};
 
 		$.post('api/Dns.Record.Remove', data, function(r) {
-			if (r.success == 1) {
+			if (r.success) {
 				$('[data-record="' + record_id + '"]').remove();
 				$('[data-expend="' + record_id + '"]').remove();
 			}
