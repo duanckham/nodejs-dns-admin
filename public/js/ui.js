@@ -190,13 +190,15 @@
 			r.data.forEach(function(item) {
 				var s = '';
 
+				console.log(item);
+
 				s += '<tr data-record="' + item.record_id + '">';
 				s += '<td style="width:320px;" onclick="Ui.getRecordDetail(this);">' + item.record_name + '</td>';
 				s += '<td style="width:520px;" onclick="Ui.getRecordDetail(this);">' + type_map[item.record_type] + '</td>';
 				s += '<td style="width:120px; text-align: right;">';
 				s += '<a href="javascript:void(0);" onclick="Ui.editRecordDetail(this);">Edit</a>';
 				s += '<span> / </span>'
-				s += '<a href="javascript:void(0);" onclick="Ui.removeRecord(\'' + item._id + '\');">Remove</a>';
+				s += '<a href="javascript:void(0);" onclick="Ui.removeRecord(\'' + item.record_id + '\');">Remove</a>';
 				s += '</td>';
 				s += '</tr>';
 
@@ -414,13 +416,13 @@
 	};
 
 	var removeRecord = function(record_id) {
-		var _data = {
+		var data = {
 			name: record_id.split(':')[0],
 			record_type: type_map[record_id.split(':')[1]]
 		};
 
-		$.post('api/Dns.Record.Remove', JSON.stringify(_data), function(data) {
-			if (data.status && data.status == 1) {
+		$.post('api/Dns.Record.Remove', data, function(r) {
+			if (r.success == 1) {
 				$('[data-record="' + record_id + '"]').remove();
 				$('[data-expend="' + record_id + '"]').remove();
 			}
