@@ -291,17 +291,31 @@ a.title:hover {
 	width: 300px;
 }
 
+.action-service-status .bar {
+	height: 40px;
+	width: 960px;
+	padding: 0 20px;
+	text-align: left;
+}
+.action-service-status .bar a {
+	line-height: 40px;
+	font-size: 12px;
+	margin: 0 10px 0 0;
+	cursor: pointer;
+	text-decoration: underline;
+}
+.action-service-status .bar a:hover {
+	color: #333;
+}
 .action-service-status .notice {
 	float: left;
-	/*background: #eee;*/
-	margin-bottom: 10px;
+	margin: 10px 0;
 	position: relative;
 }
 
 .action-service-status .notice .l {
 	float: left;
 	width: 160px;
-	/*background: #ddd;*/
 }
 .action-service-status .notice .l span.date {
 	line-height: 30px;
@@ -313,7 +327,6 @@ a.title:hover {
 .action-service-status .notice .r {
 	float: left;
 	width: 800px;
-	/*background: #ccc;*/
 	text-align: left;
 }
 .action-service-status .notice .r span {

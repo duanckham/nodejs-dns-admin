@@ -125,6 +125,8 @@
 
 			var html = [];
 
+			html.push('<div class="bar"></div>');
+
 			r.data.forEach(function(item) {
 				var s = '';
 				var spot = JSON.stringify(item.spot, null, 2); 
@@ -145,6 +147,8 @@
 
 			var l_date = r.data.length ? r.data[r.data.length - 1].date : false;
 			var r_date = r.data.length ? r.data[0].date : false;
+			var btn_refresh = $('<a>Refresh</a>');
+			var btn_allread = $('<a>Make all as read</a>');
 
 			// PAGE
 			html.push('<div class="page">');
@@ -153,6 +157,18 @@
 			html.push('</div>');
 
 			el.html(html.join(''));
+			el.find('.bar').append(btn_refresh);
+			el.find('.bar').append(btn_allread);
+
+			btn_refresh.on('click', function() {
+				renderServiceStatus(el, page);
+			});
+
+			btn_allread.on('click', function() {
+				$.post('/api/Service.Notice.Read', {id: 'all'}, function(r) {
+					$('.s').attr('class', 's');
+				});
+			});
 		};
 
 		page
