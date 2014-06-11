@@ -120,11 +120,12 @@
 
 	var renderServiceStatus = function(el, page) {
 		var render = function(r) {
-			if (r.data.length === 0)
+			if (r.data.length === 0) {
+				el.html('<div class="empty"><span>Empty</span></div>');
 				return;
+			}
 
 			var html = [];
-
 			html.push('<div class="bar"></div>');
 
 			r.data.forEach(function(item) {
@@ -149,6 +150,7 @@
 			var r_date = r.data.length ? r.data[0].date : false;
 			var btn_refresh = $('<a>Refresh</a>');
 			var btn_allread = $('<a>Make all as read</a>');
+			var btn_removeall = $('<a>Remove all</a>');
 
 			// PAGE
 			html.push('<div class="page">');
@@ -159,6 +161,7 @@
 			el.html(html.join(''));
 			el.find('.bar').append(btn_refresh);
 			el.find('.bar').append(btn_allread);
+			el.find('.bar').append(btn_removeall);
 
 			btn_refresh.on('click', function() {
 				renderServiceStatus(el, page);
@@ -167,6 +170,13 @@
 			btn_allread.on('click', function() {
 				$.post('/api/Service.Notice.Read', {id: 'all'}, function(r) {
 					$('.s').attr('class', 's');
+				});
+			});
+
+			btn_removeall.on('click', function() {
+				$.post('/api/Service.Notice.Clean', function(r) {
+					if (r.success)
+						renderServiceStatus(el, page);
 				});
 			});
 		};
