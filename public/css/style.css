@@ -145,6 +145,23 @@ table {
 	font-weight: bold;
 }
 
+.bar {
+	height: 40px;
+	width: 960px;
+	padding: 0 20px;
+	text-align: left;
+}
+.bar a {
+	line-height: 40px;
+	font-size: 12px;
+	margin: 0 10px 0 0;
+	cursor: pointer;
+	text-decoration: underline;
+}
+.bar a:hover {
+	color: #333;
+}
+
 .chart {
 	border: 1px solid #eee;
 	width: 958px;
@@ -263,7 +280,7 @@ a.title:hover {
 }
 .action-list-dns-records tr:hover,
 .action-list-proxy-rules tr:hover {
-	border-left: 1px solid #3d658c;
+	/*border-left: 1px solid #3d658c;*/
 	background: #eee;
 }
 .action-list-dns-records .actived,
@@ -273,7 +290,7 @@ a.title:hover {
 }
 .action-list-dns-records td,
 .action-list-proxy-rules td {
-	padding-left: 5px;
+	padding: 0 20px;
 }
 
 .action-list-proxy-rules .expend,
@@ -306,22 +323,6 @@ a.title:hover {
 	width: 300px;
 }
 
-.action-service-status .bar {
-	height: 40px;
-	width: 960px;
-	padding: 0 20px;
-	text-align: left;
-}
-.action-service-status .bar a {
-	line-height: 40px;
-	font-size: 12px;
-	margin: 0 10px 0 0;
-	cursor: pointer;
-	text-decoration: underline;
-}
-.action-service-status .bar a:hover {
-	color: #333;
-}
 .action-service-status .notice {
 	float: left;
 	margin: 10px 0;

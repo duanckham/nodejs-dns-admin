@@ -112,7 +112,7 @@
 
 	var renderServiceNoticeCount = function() {
 		var heartbeat = setInterval(function() {
-			$.post('/api/Service.Notice.Status', function(r) { 
+			$.post('api/Service.Notice.Status', function(r) { 
 				$('[data-action=service-status]').find('span').html(r.data.notice);
 			})	
 		}, 3000);
@@ -148,9 +148,7 @@
 
 			var l_date = r.data.length ? r.data[r.data.length - 1].date : false;
 			var r_date = r.data.length ? r.data[0].date : false;
-			var btn_refresh = $('<a>Refresh</a>');
-			var btn_allread = $('<a>Make all as read</a>');
-			var btn_removeall = $('<a>Remove all</a>');
+			
 
 			// PAGE
 			html.push('<div class="page">');
@@ -159,22 +157,28 @@
 			html.push('</div>');
 
 			el.html(html.join(''));
-			el.find('.bar').append(btn_refresh);
-			el.find('.bar').append(btn_allread);
-			el.find('.bar').append(btn_removeall);
 
-			btn_refresh.on('click', function() {
+			// INSERT BUTTONS TO BAR
+			var btnRefresh = $('<a>Refresh</a>');
+			var btnAllAsRead = $('<a>Make all as read</a>');
+			var btnRemoveAll = $('<a>Remove all</a>');
+
+			el.find('.bar').append(btnRefresh);
+			el.find('.bar').append(btnAllAsRead);
+			el.find('.bar').append(btnRemoveAll);
+
+			btnRefresh.on('click', function() {
 				renderServiceStatus(el, page);
 			});
 
-			btn_allread.on('click', function() {
-				$.post('/api/Service.Notice.Read', {id: 'all'}, function(r) {
+			btnAllAsRead.on('click', function() {
+				$.post('api/Service.Notice.Read', {id: 'all'}, function(r) {
 					$('.s').attr('class', 's');
 				});
 			});
 
-			btn_removeall.on('click', function() {
-				$.post('/api/Service.Notice.Clean', function(r) {
+			btnRemoveAll.on('click', function() {
+				$.post('api/Service.Notice.Clean', function(r) {
 					if (r.success)
 						renderServiceStatus(el, page);
 				});
@@ -182,13 +186,13 @@
 		};
 
 		page
-			? $.post('/api/Service.Notice.List', page, render)
-			: $.post('/api/Service.Notice.List', render);
+			? $.post('api/Service.Notice.List', page, render)
+			: $.post('api/Service.Notice.List', render);
 	};
 
 	var getNoticeDetail = function(el, id) {
 		if ($(el).parents('.notice').attr('data-read') == 0) {
-			$.post('/api/Service.Notice.Read', {id: id}, function(r) {
+			$.post('api/Service.Notice.Read', {id: id}, function(r) {
 				if (r.success) {
 					$(el).parents('.notice').find('.s').attr('class', 's');
 					$(el).closest('.s').attr('class', 's');
@@ -218,32 +222,54 @@
 	};
 
 	var renderDnsRecordsList = function(el) {
+		$.post('api/Dns.Record.Cached', function(r) {
+			if (!r.success) 
+				return;
+
+			var html = [];
+			for (var type in r.data) {
+				var s = '';
+
+				s += '<tr>';
+				s += '<td style="min-width:320px;">' + type_map[type] + '</td>';
+				s += '<td style="min-width:520px;">' + r.data[type] + '</td>';
+				s += '<td style="min-width:119px; text-align: right;">';
+				s += '<a href="javascript:void(0);" onclick="Ui.removeCached(this, ' + type + ');">Clean</a>';
+				s += '</td>';
+				s += '</tr>';
+
+				html.push(s);
+			}			
+
+			// // CLEAN TABLE
+			el.find('table.cached').html('');
+			el.find('table.cached').append(html.join(''));
+		}, 'json');
+
 		$.post('api/Dns.Record.List', function(r) {
 			if (!r.success) 
 				return;
 
-			// CLEAN TABLE
-			el.find('table').html('');
-
 			var html = [];
-			
 			r.data.forEach(function(item) {
 				var s = '';
 
 				s += '<tr data-record="' + item.record_id + '">';
-				s += '<td style="width:320px;" onclick="Ui.getRecordDetail(this);">' + item.record_name + '</td>';
-				s += '<td style="width:520px;" onclick="Ui.getRecordDetail(this);">' + type_map[item.record_type] + '</td>';
-				s += '<td style="width:120px; text-align: right;">';
+				s += '<td style="min-width:320px;" onclick="Ui.getRecordDetail(this);">' + item.record_name + '</td>';
+				s += '<td style="min-width:520px;" onclick="Ui.getRecordDetail(this);">' + type_map[item.record_type] + '</td>';
+				s += '<td style="min-width:119px; text-align: right;">';
 				s += '<a href="javascript:void(0);" onclick="Ui.editRecordDetail(this);">Edit</a>';
-				s += '<span> / </span>'
+				s += '<span> / </span>';
 				s += '<a href="javascript:void(0);" onclick="Ui.removeRecord(\'' + item.record_id + '\');">Remove</a>';
 				s += '</td>';
 				s += '</tr>';
 
-				html.push(s);			
+				html.push(s);
 			});
 
-			el.find('table').append(html.join(''));
+			// CLEAN TABLE
+			el.find('table.custom').html('');
+			el.find('table.custom').append(html.join(''));
 		}, 'json');
 	};
 
@@ -463,6 +489,13 @@
 		}, 'json');
 	};
 
+	var removeCached = function(e, type) {
+		$.post('api/Dns.Record.Clean', {type: type}, function(r) {
+			if (r.success)
+				$(e).parents('tr').find('td:eq(1)').html('0');
+		});
+	};
+
 	var renderProxyRulesList = function(el) {
 		$.post('api/Proxy.Rule.List', function(r) {
 
@@ -593,11 +626,12 @@
 			_el.attr('data-id', count + 1)
 			$(el).closest('tr').before(_el);
 		});
-		$('button[data-count]').attr('data-count', count + 1)
+		$('button[data-count]').attr('data-count', count + 1);
 	};
 
 	exports.modifyRecord = modifyRecord;
 	exports.removeRecord = removeRecord;
+	exports.removeCached = removeCached;
 	exports.createRecord = createRecord;
 	exports.prevNoticePage = prevNoticePage;
 	exports.nextNoticePage = nextNoticePage;
