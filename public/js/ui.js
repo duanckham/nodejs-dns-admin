@@ -254,13 +254,13 @@
 			r.data.forEach(function(item) {
 				var s = '';
 
-				s += '<tr data-record="' + item.record_id + '">';
-				s += '<td style="min-width:320px;" onclick="Ui.getRecordDetail(this);">' + item.record_name + '</td>';
-				s += '<td style="min-width:520px;" onclick="Ui.getRecordDetail(this);">' + type_map[item.record_type] + '</td>';
+				s += '<tr data-record="' + item.id + '">';
+				s += '<td style="min-width:320px;" onclick="Ui.getRecordDetail(this);">' + item.name + '</td>';
+				s += '<td style="min-width:520px;" onclick="Ui.getRecordDetail(this);">' + type_map[item.type] + '</td>';
 				s += '<td style="min-width:119px; text-align: right;">';
 				s += '<a href="javascript:void(0);" onclick="Ui.editRecordDetail(this);">Edit</a>';
 				s += '<span> / </span>';
-				s += '<a href="javascript:void(0);" onclick="Ui.removeRecord(\'' + item.record_id + '\');">Remove</a>';
+				s += '<a href="javascript:void(0);" onclick="Ui.removeRecord(\'' + item.id + '\');">Remove</a>';
 				s += '</td>';
 				s += '</tr>';
 
