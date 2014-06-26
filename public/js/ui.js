@@ -357,7 +357,7 @@
 			// INSERT
 			for (var i in data) {
 
-				if (!i.match(/general|telecom|unicom/))
+				if (!i.match(/telecom|unicom/))
 					continue;
 
 				var s = [];
