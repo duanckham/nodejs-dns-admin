@@ -354,13 +354,12 @@
 				? el.next().html('')
 				: $(el).after($('<tr class="expend" data-expend="' + record_id + '"></tr>'));
 
-			delete data._id;
-			delete data.custom;
-
-			console.log(data);
-
 			// INSERT
 			for (var i in data) {
+
+				if (!i.match(/general|telecom|unicom/))
+					continue;
+
 				var s = [];
 				s.push('<td style="width: 470px;">');
 				s.push('<table class="form" data-form="' + i + '">');
